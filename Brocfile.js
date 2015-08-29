@@ -3,6 +3,7 @@ var compileModules = require('broccoli-babel-transpiler');
 var mergeTrees = require('broccoli-merge-trees');
 var path = require('path');
 var concat = require('broccoli-concat');
+var replace = require('broccoli-string-replace');
 
 var libTreeES6 = pickFiles('lib', {
   srcDir: '/',
@@ -47,7 +48,34 @@ var cpToTest = function(absPath) {
 }
 
 var testIndex = cpToTest('tests/index.html');
-var loader = cpToTest('node_modules/loader.js/loader.js');
+var loader = cpToTest('vendor/loader.js');
+
+var promisesAplusTests = pickFiles('node_modules/promises-aplus-tests/lib/tests', {
+  srcDir: '/',
+  files: ['helpers/*.js', '*.js'],
+  destDir: '/'
+});
+
+promisesAplusTests = compileModules(promisesAplusTests, {
+  modules: 'umd',
+  moduleIds: true
+});
+
+promisesAplusTests = concat(promisesAplusTests, {
+  inputFiles: ['**/*.js'],
+  outputFile: '/tests/promises-aplus-specification.js'
+});
+
+promisesAplusTests = replace(promisesAplusTests, {
+  files: ['**/*.js'],
+  pattern: {
+    match: /require\("\.\//g,
+    replacement: 'require("'
+  }
+});
+
+chaiTree = cpToTest('node_modules/testem/public/testem/chai.js');
+sinonTree = cpToTest('node_modules/sinon/pkg/sinon.js');
 
 module.exports = mergeTrees([
   libTree,
@@ -55,5 +83,8 @@ module.exports = mergeTrees([
   testIndex,
   testsConcat,
   libConcat,
-  loader
+  loader,
+  promisesAplusTests,
+  chaiTree,
+  sinonTree
 ]);

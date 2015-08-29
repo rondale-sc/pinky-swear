@@ -4,21 +4,38 @@
         <title>Test'em</title>
         <link rel="stylesheet" href="/testem/mocha.css">
         <script src="loader.js"></script>
-        <script>define.amd = true;</script>
+        <script src="chai.js"></script>
+        <script>
+            window.assert = chai.assert;
+            define('assert', [], function(exports, global, module){
+              module.exports = window.assert;
+            });
+            define.amd = true;
+        </script>
         <script src="/testem/mocha.js"></script>
         <script src="/testem/chai.js"></script>
+        <script src="sinon.js"></script>
         <script src="/testem.js"></script>
+
+        <script src="promises-aplus-specification.js"></script>
+
         <script>mocha.setup('bdd')</script>
         <script src="../pinky-swear.js"></script>
+        <script>
+            window.global = window;
+            global.adapter = require("pinky-swear/pinky-swear");
+        </script>
         <script src="../tests.js"></script>
     </head>
     <body>
         <div id="mocha"></div>
         <script>
             var moduleName, shouldLoad;
+
             for (moduleName in requirejs.entries) {
                 shouldLoad = false;
                 if (moduleName.match(/[-_]test$/)) { shouldLoad = true; }
+                if (moduleName.match(/\d\.\d\.\d$/)) { shouldLoad = true; }
                 if (moduleName.match(/jshint/)) { shouldLoad = true; }
                 if (shouldLoad) { require(moduleName); }
             }
