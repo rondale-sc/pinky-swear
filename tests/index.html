@@ -3,10 +3,12 @@
     <head>
         <title>Test'em</title>
         <link rel="stylesheet" href="/testem/mocha.css">
+        <script src="rsvp.js"></script>
         <script src="loader.js"></script>
         <script src="chai.js"></script>
+
         <script>
-            window.assert = chai.assert;
+            window.assert=chai.assert
             define('assert', [], function(exports, global, module){
               module.exports = window.assert;
             });
@@ -17,7 +19,7 @@
         <script src="sinon.js"></script>
         <script src="/testem.js"></script>
 
-        <script src="promises-aplus-specification.js"></script>
+        <!-- <script src="promises-aplus-specification.js"></script> -->
 
         <script>mocha.setup('bdd')</script>
         <script src="../pinky-swear.js"></script>

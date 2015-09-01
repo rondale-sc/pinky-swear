@@ -5,6 +5,8 @@ var path = require('path');
 var concat = require('broccoli-concat');
 var replace = require('broccoli-string-replace');
 
+var optionalTreesToMerge = [];
+
 var libTreeES6 = pickFiles('lib', {
   srcDir: '/',
   files: ['**/*.js'],
@@ -50,32 +52,39 @@ var cpToTest = function(absPath) {
 var testIndex = cpToTest('tests/index.html');
 var loader = cpToTest('vendor/loader.js');
 
-var promisesAplusTests = pickFiles('node_modules/promises-aplus-tests/lib/tests', {
-  srcDir: '/',
-  files: ['helpers/*.js', '*.js'],
-  destDir: '/'
-});
+if (process.env.INTEGRATION_TEST) {
+  var promisesAplusTests = pickFiles('node_modules/promises-aplus-tests/lib/tests', {
+    srcDir: '/',
+    files: ['helpers/*.js', '*.js'],
+    destDir: '/'
+  });
 
-promisesAplusTests = compileModules(promisesAplusTests, {
-  modules: 'umd',
-  moduleIds: true
-});
+  promisesAplusTests = compileModules(promisesAplusTests, {
+    modules: 'umd',
+    moduleIds: true
+  });
 
-promisesAplusTests = concat(promisesAplusTests, {
-  inputFiles: ['**/*.js'],
-  outputFile: '/tests/promises-aplus-specification.js'
-});
+  promisesAplusTests = concat(promisesAplusTests, {
+    inputFiles: ['**/*.js'],
+    outputFile: '/tests/promises-aplus-specification.js'
+  });
 
-promisesAplusTests = replace(promisesAplusTests, {
-  files: ['**/*.js'],
-  pattern: {
-    match: /require\("\.\//g,
-    replacement: 'require("'
-  }
-});
+  promisesAplusTests = replace(promisesAplusTests, {
+    files: ['**/*.js'],
+    pattern: {
+      match: /require\("\.\//g,
+      replacement: 'require("'
+    }
+  });
+
+  optionalTreesToMerge.push(promisesAplusTests);
+}
+
+RSVPTree = cpToTest('node_modules/rsvp/dist/rsvp.js');
 
 chaiTree = cpToTest('node_modules/testem/public/testem/chai.js');
 sinonTree = cpToTest('node_modules/sinon/pkg/sinon.js');
+
 
 module.exports = mergeTrees([
   libTree,
@@ -84,7 +93,7 @@ module.exports = mergeTrees([
   testsConcat,
   libConcat,
   loader,
-  promisesAplusTests,
   chaiTree,
-  sinonTree
+  sinonTree,
+  RSVPTree
 ]);
