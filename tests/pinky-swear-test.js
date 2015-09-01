@@ -35,7 +35,7 @@ describe('When pending, a promise', function(){
 });
 
 describe('then', function(){
-  it('', function(done){
+  it('resolves with proper value', function(done){
     const { promise, resolve, reject } = deferred();
 
     promise.then(function(foo){
@@ -44,5 +44,16 @@ describe('then', function(){
     }, null);
 
     resolve('foo');
+  });
+
+  it('rejects with proper value', function(done){
+    const { promise, resolve, reject } = deferred();
+
+    promise.then(null, function(foo){
+      expect(foo).to.equal('foo');
+      done();
+    });
+
+    reject('foo');
   });
 });
