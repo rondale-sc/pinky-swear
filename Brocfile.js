@@ -96,4 +96,4 @@ module.exports = mergeTrees([
   chaiTree,
   sinonTree,
   RSVPTree
-]);
+].concat(optionalTreesToMerge));
